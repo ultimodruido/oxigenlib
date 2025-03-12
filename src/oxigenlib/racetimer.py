@@ -1,8 +1,12 @@
 """
+racetimer.py
+------------
 Simple Timer for providing a time reference in the messages to the dongle
 """
 from time import monotonic_ns
 from struct import pack
+
+__all__ = ['RaceTimer']
 
 class RaceTimer:
     def __init__(self):
