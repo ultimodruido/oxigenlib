@@ -54,12 +54,13 @@ class Dongle:
         if self._connected:
             bytes_in_pipeline = self._dongle.inWaiting()
             # check if waiting pipeline matches the expectation
-            if bytes_in_pipeline % 13:
-                # TODO read in chunks of 13 bytes
+            if (bytes_in_pipeline % 13) == 0:
+                # read in chunks of 13 bytes
                 self.read()
             else:
-                # TODO something went wrong -> flush the content of the pipeline
+                # something went wrong -> flush the content of the pipeline
                 self._flush(bytes_in_pipeline)
+                events.dongle_flush_cache.emit()
 
 oxigen_dongle = Dongle()
 

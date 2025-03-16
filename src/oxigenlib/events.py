@@ -16,6 +16,8 @@ class Events:
     transmit_command_event = Signal(bytes)
     # new data arrived from the dongle
     dongle_new_data_available_event = Signal(DongleRxData)
+    # dongle wrong cache length - need flush
+    dongle_flush_cache = Signal()
 
     # module events
     # new lap event : id / timestamp / laptime / info_flag
