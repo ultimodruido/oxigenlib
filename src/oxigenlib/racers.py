@@ -5,7 +5,7 @@ maintain and update the list of players
 """
 from pydantic import BaseModel
 
-from .carcontroller import CarController, decode_dongle_pkg
+from .carcontroller import CarController, decode_dongle_pkg, create_new_player
 from .dongle_rx import DongleRxData
 from .events import oxigen_events as events
 
@@ -14,12 +14,15 @@ class Racers(BaseModel):
     players: dict[int, CarController]
 
     def update(self, data: DongleRxData):
-        # TODO
         # decode DongleRxData
         new_car_data = decode_dongle_pkg(data)
         # extract id
         car_id = new_car_data.id
         # compare differences
+
+        # check if player exists:
+        if car_id not in self.players.keys():
+            self.players[car_id] = create_new_player(car_id)
 
         # check new lap
         if self.players[car_id].lap_count < new_car_data.lap_count:
