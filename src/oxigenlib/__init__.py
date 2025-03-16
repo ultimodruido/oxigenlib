@@ -3,8 +3,7 @@ OxigenLib
 ---------
 TODO: add description
 """
-#__all__ = ['oxigen_constants', 'utils']
-#from .dongle import Dongle
+VERSION = "0.1"
 
 from .config import RaceState, Command, PitLaneTrigger, PitLaneCount, PowerMeanValue
 from .config import O2Config, O2RaceStatus, OxigenSystem
