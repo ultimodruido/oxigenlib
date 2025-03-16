@@ -68,3 +68,35 @@ def decode_dongle_pkg(data: DongleRxData) -> CarController:
         # from timer_* & lap_time_delay bytes
         timestamp_msg_cs = data.timestamp_msg_cs
     )
+
+
+def create_new_player(car_id: int) -> CarController:
+    """"""
+
+    return CarController(
+        # from status byte
+        car_reset = False,
+        car_controller_link = True,
+        car_in_pit_lane  = False,
+        # from id byte
+        id = car_id,
+        # from last_lap_time_* bytes
+        last_lap_time_s = 0,
+        # from lap_count_* bytes
+        lap_count = 0,
+        # from power_byte byte
+        power_mean_value = 0,
+        car_on_track = True,
+        # from firmware byte
+        car_firmware = "unknown", # TODO
+        controller_firmware = "unknown", # TODO
+        # from buttons byte
+        controller_batt_low = False,
+        track_call_check = False,
+        lap_time_info = False,
+        arrow_up_btn = False,
+        arrow_down_btn = False,
+        round_btn = False,
+        # from timer_* & lap_time_delay bytes
+        timestamp_msg_cs = 0
+    )
