@@ -12,7 +12,7 @@ from .events import oxigen_events as events
 class Dongle:
     def __init__(self):
         self._port = ""
-        self.o2_dongle = None
+        self._dongle = None
         self._connected = False
 
     def connect(self, port: str) -> None:
@@ -20,13 +20,13 @@ class Dongle:
             print(f"Dongle on port {self._port} is already connected. Try disconnecting first")
             return
         try:
-            self.o2_dongle = serial.Serial(port)
+            self._dongle = serial.Serial(port)
             self._connected = True
             # send firmware request
             data = encode_firmware_version_request()
             self.send(data)
             # read reply
-            data = read_dongle_firmware(self.o2_dongle.read(5))
+            data = read_dongle_firmware(self._dongle.read(5))
             # TODO check that firmware is OK with this library
             # send free race so that the controller start notify themselves
             data = encode_free_race()
@@ -38,20 +38,21 @@ class Dongle:
             print(f"Unable to open communication with the dongle on {port}. Try again")
             events.dongle_connected_event.emit(False)
 
+
     def send(self, bytes_data: bytes) -> None:
-        self.o2_dongle.send(bytes_data)
+        self._dongle.write(bytes_data)
 
     def read(self) -> None:
         """Read a chunk of 13 bytes"""
-        data = read_dongle_pkg(self.o2_dongle.read(13))
+        data = read_dongle_pkg(self._dongle.read(13))
         events.dongle_new_data_available_event.emit(data)
 
     def _flush(self, num_bytes: int) -> None:
-        self.o2_dongle.read(num_bytes)
+        self._dongle.read(num_bytes)
 
     def check_data_waiting(self) -> None:
         if self._connected:
-            bytes_in_pipeline = self.o2_dongle.inWaiting()
+            bytes_in_pipeline = self._dongle.inWaiting()
             # check if waiting pipeline matches the expectation
             if bytes_in_pipeline % 13:
                 # TODO read in chunks of 13 bytes
