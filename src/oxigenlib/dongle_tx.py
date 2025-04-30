@@ -5,10 +5,10 @@ Decode and send messages from the dongle
 """
 from struct import pack
 
-import src.oxigenlib.config
-from . import constants as o2
+#from . import config
+#from . import constants as o2
 from .racetimer import RaceTimer
-from .config import O2Config, O2RaceStatus, O2Command
+from .config import O2Config, O2RaceStatus, O2Command, Command
 
 # TODO: protocols?!
 #__all__ = ['encode_race_status', 'encode_command']
@@ -34,7 +34,7 @@ def _encode_global_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts
     byte2 = 0x00  # controllder ID
     byte3 = cmd.command.value # global command
     byte4 = cmd.command_arg  # command argument
-    byte5 = 0x80 | src.oxigenlib.config.Command.NO_ACTION.value  # car command / no action
+    byte5 = 0x80 | Command.NO_ACTION.value  # car command / no action
     byte6 = 0x00  # command argument
     byte7 = cfg.power_mean_value.value
 
@@ -46,7 +46,7 @@ def _encode_car_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts: R
     byte0 = 0x06 | cfg.pit_lane_count.value | cfg.pit_lane_trigger.value
     byte1 = race.max_speed
     byte2 = cmd.id  # controllder ID
-    byte3 = src.oxigenlib.config.Command.NO_ACTION.value  # global command / no action
+    byte3 = Command.NO_ACTION.value  # global command / no action
     byte4 = 0x00 # command argument
     byte5 = 0x80 | cmd.command.value  # car command
     byte6 = cmd.command_arg  # command argument
