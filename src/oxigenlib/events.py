@@ -21,7 +21,7 @@ class Events:
 
     # module events
     # new lap event : id / timestamp / laptime / info_flag
-    new_lap_event = Signal(int, int, float, bool)
+    new_lap_event = Signal(int, int, int, float, bool)
     # pit enter-leave : event id / timestamp
     pit_lane_enter_event = Signal(int, int)
     pit_lane_leave_event = Signal(int, int)
