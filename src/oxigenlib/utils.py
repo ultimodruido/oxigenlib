@@ -9,7 +9,15 @@ from .config import RaceState, Command
 from .racetimer import RaceTimer
 from .dongle_tx import encode_race_status, encode_command
 from .events import oxigen_events as events
-#__all__ = ['transmit_command_event', 'set_start_config']
+__all__ = [
+    'set_start_config',
+    'set_system_max_speed',
+    'set_race_state',
+    'set_pit_stop_speed_limit',
+    'set_car_max_speed',
+    'set_car_min_speed',
+    'set_car_max_brake'
+]
 
 # transmit_command_event = Signal(bytes)
 
