@@ -28,6 +28,7 @@ class Racers(BaseModel):
         if self.players[car_id].lap_count < new_car_data.lap_count:
             events.new_lap_event.emit(
                 car_id,
+                new_car_data.lap_count,
                 new_car_data.timestamp_msg_cs,
                 new_car_data.last_lap_time_s,
                 new_car_data.lap_time_info
