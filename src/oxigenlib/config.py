@@ -17,7 +17,7 @@ class RaceState(Enum):
     RUNNING = 0x03
     PAUSED = 0x04
     FLAGGED_LC_ON = 0x05
-    FLAGGED_PC_OFF = 0x15
+    FLAGGED_LC_OFF = 0x15
 
 
 class Command(Enum):
