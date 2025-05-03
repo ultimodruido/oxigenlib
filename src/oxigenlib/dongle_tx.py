@@ -14,6 +14,17 @@ from .config import O2Config, O2RaceStatus, O2Command, Command
 #__all__ = ['encode_race_status', 'encode_command']
 
 def encode_race_status(race: O2RaceStatus, cfg: O2Config, ts: RaceTimer) -> bytes:
+    """
+    return the byte array to transmit to the dongle to send the desired race status
+
+            Parameters:
+                    race (O2RaceStatus): class describing the race status (included in OxigenSystem)
+                    cfg (O2Config): class describing the system configuration (included in OxigenSystem)
+                    ts (RaceTimer): : class providing timer functions
+
+            Returns:
+                    bytes: byte array ready to be sent to the dongle
+    """
     # TODO: coupling! how to access value better?
     byte0 = race.race_status.value | cfg.pit_lane_count.value | cfg.pit_lane_trigger.value
     byte1 = race.max_speed
@@ -31,7 +42,7 @@ def encode_race_status(race: O2RaceStatus, cfg: O2Config, ts: RaceTimer) -> byte
 def _encode_global_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts: RaceTimer) -> bytes:
     byte0 = 0x06 | cfg.pit_lane_count.value | cfg.pit_lane_trigger.value
     byte1 = race.max_speed
-    byte2 = 0x00  # controllder ID
+    byte2 = 0x00  # controller ID
     byte3 = cmd.command.value # global command
     byte4 = cmd.command_arg  # command argument
     byte5 = 0x80 | Command.NO_ACTION.value  # car command / no action
@@ -45,7 +56,7 @@ def _encode_global_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts
 def _encode_car_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts: RaceTimer) -> bytes:
     byte0 = 0x06 | cfg.pit_lane_count.value | cfg.pit_lane_trigger.value
     byte1 = race.max_speed
-    byte2 = cmd.id  # controllder ID
+    byte2 = cmd.id  # controller ID
     byte3 = Command.NO_ACTION.value  # global command / no action
     byte4 = 0x00 # command argument
     byte5 = 0x80 | cmd.command.value  # car command
@@ -56,13 +67,31 @@ def _encode_car_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts: R
     return pack('11B', byte0, byte1, byte2, byte3, byte4, byte5, byte6, byte7, *ts.value_cs_bytes())
 
 def encode_command(race: O2RaceStatus, cfg: O2Config, cmd: O2Command, ts: RaceTimer) -> bytes:
+    """
+    return the byte array to transmit to the dongle to send the desired command
+
+            Parameters:
+                    race (O2RaceStatus): class describing the race status (included in OxigenSystem)
+                    cfg (O2Config): class describing the system configuration (included in OxigenSystem)
+                    cmd (O2Command): class defining the desired command
+                    ts (RaceTimer): : class providing timer functions
+
+            Returns:
+                    bytes: byte array ready to be sent to the dongle
+    """
     if cmd.id == 0:  # global command
         return _encode_global_command(race, cfg, cmd, ts)
     else:  # car specific command
         return _encode_car_command(race, cfg, cmd, ts)
 
 def encode_firmware_version_request() -> bytes:
+    """
+    return the byte array to transmit to the dongle to request its firmware version
+    """
     return pack('11B', 0x06, 0x06, 0x06, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00)
 
 def encode_free_race() -> bytes:
+    """
+    return the byte array to transmit to the dongle to initiate a free race session
+    """
     return pack('11B', 0x0F, 0xFF, 0x00, 0x00, 0x00, 0x80, 0x00, 0x80, 0x00, 0x00, 0x00)
