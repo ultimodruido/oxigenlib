@@ -40,12 +40,19 @@ class Dongle:
 
 
     def send(self, bytes_data: bytes) -> None:
-        self._dongle.write(bytes_data)
+        if self._connected:
+            self._dongle.write(bytes_data)
+        else:
+            events.dongle_connected_event.emit(False)
 
     def read(self) -> None:
-        """Read a chunk of 13 bytes"""
-        data = read_dongle_pkg(self._dongle.read(13))
-        events.dongle_new_data_available_event.emit(data)
+        if self._connected:
+            """Read a chunk of 13 bytes"""
+            data = read_dongle_pkg(self._dongle.read(13))
+            events.dongle_new_data_available_event.emit(data)
+        else:
+            events.dongle_connected_event.emit(False)
+
 
     def _flush(self, num_bytes: int) -> None:
         self._dongle.read(num_bytes)
