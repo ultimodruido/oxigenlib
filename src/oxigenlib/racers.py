@@ -1,8 +1,13 @@
 """
-racers.py
----------
-maintain and update the list of players
+Racer Module
+------------
+File: ``racers.py``
+
+Maintain and update the list of players.
+This module exposes an instance of class ``Racers`` as ``oxigen_racers``.
+
 """
+from typing import Optional
 from pydantic import BaseModel
 
 from .carcontroller import CarController, decode_dongle_pkg, create_new_player
@@ -10,10 +15,31 @@ from .dongle_rx import DongleRxData
 from .events import oxigen_events as events
 
 
+__all__ = ['get_player_data']
+
 class Racers(BaseModel):
+    """
+    Container class for the data package returned by the dongle that represents car-controller pair
+
+    ...
+
+    Attributes
+    ----------
+    players: dict[int, CarController]
+        dictionary of players/cars indexed by car id
+
+    """
     players: dict[int, CarController]
 
-    def update(self, data: DongleRxData):
+    def update(self, data: DongleRxData) -> None:
+        """
+        update players info with new data arriving from the dongle
+
+        :param data: class containing the received bytes from the dongle
+        :type data: DongleRxData
+
+        :return: None
+        """
         # decode DongleRxData
         new_car_data = decode_dongle_pkg(data)
         # extract id
@@ -45,20 +71,32 @@ class Racers(BaseModel):
         self.players[car_id] = new_car_data
         self.global_events_check()
 
-    def global_events_check(self):
-        # check for track call
-        check_data = [car.track_call_check for car in self.players.values()]
-        if any(check_data):
-            events.track_call_event.emit(True)
-        else:
-            events.track_call_event.emit(False)
+    def global_events_check(self) -> None:
+        """
+        verify changes in global event and raise one if the case
 
-        # checl all cars on track
-        check_data = [car.car_on_track for car in self.players.values()]
-        if all(check_data):
-            events.all_cars_on_track_event.emit(True)
+        :return: None
+        """
+        # check for track call
+        check_data = [(car.id, car.track_call_check, car.car_on_track) for car in self.players.values()]
+        track_call_with_id = [car[0] for car in check_data if car[1]]
+        if len(track_call_with_id):
+            events.track_call_event.emit(True, track_call_with_id)
         else:
-            events.all_cars_on_track_event.emit(False)
+            events.track_call_event.emit(False, [])
+
+        # check if all cars are on track
+        car_not_on_track_with_id = [car[0] for car in check_data if not car[2]]
+        if len(car_not_on_track_with_id):
+            events.all_cars_on_track_event.emit(False, car_not_on_track_with_id)
+        else:
+            events.all_cars_on_track_event.emit(True, [])
+
+    def get_player_data(self, player_id) -> Optional[CarController]:
+        if player_id in self.players.keys():
+            return self.players[player_id]
+        else:
+            return None
 
 #empty_dict = {}
 oxigen_racers = Racers(players={})
@@ -67,3 +105,14 @@ oxigen_racers = Racers(players={})
 def _update(data: DongleRxData):
     # forward the signal to the class
     oxigen_racers.update(data)
+
+def get_player_data(car_id: int) -> Optional[CarController]:
+    """
+    Retrieve all data available for a plyer/car.
+
+    :param car_id: Number of the car to which the limitation applies
+    :type car_id: int
+
+    :return: None if no data is available or a ``CarController`` instance
+    """
+    oxigen_racers.get_player_data(car_id)

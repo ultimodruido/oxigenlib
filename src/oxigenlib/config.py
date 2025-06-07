@@ -1,7 +1,7 @@
 """
 config.py
 ---------
-collection of classes necessary to configure the system
+collection of classes necessary to configure the system and enumeration types for confortable selection of the options
 """
 from enum import Enum
 from pydantic import BaseModel, Field
@@ -64,5 +64,15 @@ class O2Command(BaseModel):
 
 # TODO is OxigenSystem necessary?
 class OxigenSystem(BaseModel):
+    """
+    Class representing an Oxigen system
+    it has 2 attributes:
+
+    :param race_state: class containing the actual race state, refer to the RaceState enum for options
+    :type race_state: O2RaceStatus
+
+    :param config: flag reminder if a car has recently been reset
+    :type config: O2Config
+    """
     race_state: O2RaceStatus
     config: O2Config

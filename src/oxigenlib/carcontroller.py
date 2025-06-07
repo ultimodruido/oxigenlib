@@ -1,16 +1,62 @@
 """
-carcontroller.py
-----------------
-Convert data from dongle in a easy class CarState
+CarController Module
+--------------------
+File: ``carcontroller.py``
+
+This module provides a convenience class CarController to transfer the input data from the dongle to other users.
 """
 from pydantic import BaseModel, Field
 
 from . import constants as o2
 from .dongle_rx import DongleRxData
 
-__all__ = ['CarController', 'decode_dongle_pkg']
+__all__ = ['CarController', 'decode_dongle_pkg', 'create_new_player']
 
 class CarController(BaseModel):
+    """
+    Container class for the data package returned by the dongle that represents car-controller pair
+
+    :param car_reset: flag reminder if a car has recently been reset
+    :type car_reset: bool
+    :param car_controller_link: link to car available
+    :type car_controller_link: bool
+    :param car_in_pit_lane: flag if car is in the pitlane
+    :type car_in_pit_lane: bool
+    :param id: identification number of the car
+    :type id: int
+    :param last_lap_time_s: keep the last lap time in seconds
+    :type last_lap_time_s: float
+    :param lap_count: numbers of laps recorded by the car
+    :type lap_count: int
+    :param power_mean_value: position of trigger or average value of pwm signal.
+        It depends on the configuration parameter of the system
+    :type power_mean_value: float
+    :param car_on_track: flag reporting if the car is or not on the track
+    :type car_on_track: bool
+    :param car_firmware: firmware value of car chip
+    :type car_firmware: str
+    :param controller_firmware: firmware value of the controller
+    :type controller_firmware: str
+
+    :param controller_batt_low: flag reporting low battery status
+    :type controller_batt_low: bool
+    :param track_call_check: flag reporting if controller reported track call
+    :type track_call_check: bool
+
+    :param lap_time_info: flag reporting if lap time includes a 'short lap'
+    :type lap_time_info: bool
+    :param arrow_up_btn: up button pressed on controller
+    :type arrow_up_btn: bool
+    :param arrow_down_btn: down button pressed on controller
+    :type arrow_down_btn: bool
+    :param round_btn: up button pressed on controller
+    :type round_btn: bool
+
+    :param timestamp_msg_cs: timestamp of the transmitted message in centiseconds.
+        Value already aligned with the dongle timer according formula _race timer (last lap)_
+        of the official oxigen documentation
+    :type timestamp_msg_cs: int
+    """
     # from status byte
     car_reset: bool
     car_controller_link: bool
@@ -39,7 +85,15 @@ class CarController(BaseModel):
 
 
 def decode_dongle_pkg(data: DongleRxData) -> CarController:
-    """"""
+    """
+    Convert dongle package into readable an structured CarController class
+
+    :param data: class containing the received bytes from the dongle
+    :type data: DongleRxData
+
+    :return: content of dongle transmission converted in easy format into class CarController
+    :rtype: CarController
+    """
 
     return CarController(
         # from status byte
@@ -71,7 +125,16 @@ def decode_dongle_pkg(data: DongleRxData) -> CarController:
 
 
 def create_new_player(car_id: int) -> CarController:
-    """"""
+    """
+    Support function to generate an empty CarController class for a new player with a known id.
+    Useful to generate a starting CarController while filling the racers list at the registration fase
+
+    :param car_id: Number of the car to add to the system
+    :type car_id: int
+
+    :return: content of dongle transmission converted in easy format into class CarController
+    :rtype: CarController
+    """
 
     return CarController(
         # from status byte

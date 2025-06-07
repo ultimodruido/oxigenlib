@@ -1,7 +1,9 @@
-""""
-dongle.py
----------
-create the class and instance to communicate with the dongle
+"""
+Dongle Module
+-------------
+File: ``dongle.py``
+
+class and instance to communicate with the dongle
 """
 import serial
 

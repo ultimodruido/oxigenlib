@@ -1,6 +1,8 @@
 """
-constants.py
-------------
+Constants Module
+----------------
+File: ``constants.py``
+
 collection of important values for the oxigen protocol
 """
 ## trasmitting contants flags

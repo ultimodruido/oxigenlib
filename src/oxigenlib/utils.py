@@ -1,7 +1,9 @@
 """
-utils.py
----------
-collection of functions to send instruction via dongle
+Utils Module (utils.py)
+-----------------------
+File: ``utils.py``
+
+collection of functions to send instruction to the dongle
 """
 from .config import O2Command, O2RaceStatus, O2Config, OxigenSystem
 from .config import PitLaneTrigger, PitLaneCount, PowerMeanValue
@@ -30,16 +32,17 @@ def set_start_config(
     """
     Set the initial configuration of the Oxigen system.
 
-            Parameters:
-                    max_speed (int): A decimal integer between 0 and 255
-                    pit_lane_trigger (PitLaneTrigger): enum defining if the entering or leaving
-                                                       the pitlane triggers also lane count
-                    pit_lane_count (PitLaneCount): enum defining if the pitlane triggers also lane count
-                    power_mean_value (PowerMeanValue): enum defining if the average trigger position
-                                                       or the transferred PWM value is reported for fuel consumption
+    :param max_speed: A decimal integer between 0 and 255
+    :type max_speed: int
+    :param pit_lane_trigger: enum defining if the entering or leaving the pitlane triggers also lane count
+    :type pit_lane_trigger: PitLaneTrigger
+    :param pit_lane_count: enum defining if the pitlane triggers also lane count
+    :type pit_lane_count: PitLaneCount
+    :param power_mean_value: enum defining if the average trigger position or the transferred PWM value is reported for fuel consumptio
+    :type power_mean_value: int
 
-            Returns:
-                    OxigenSystem: class descriptor of the system in use
+    :return: class descriptor of the system in use
+    :rtype: OxigenSystem
     """
     rs = O2RaceStatus(
         race_status=RaceState.STOPPED,
@@ -59,14 +62,17 @@ def set_start_config(
 def set_system_max_speed(max_speed: int, sys: OxigenSystem, timer: RaceTimer) -> None:
     """
     Set the maximum speed allowed.
+    NOTE: this function controls the maximum speed allowed on the track,
+    it overrides every setting applied to singel cars
 
-            Parameters:
-                    max_speed (int): A decimal integer between 0 and 255
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param max_speed: A decimal integer between 0 and 255
+    :type max_speed: int
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     sys.race_state.max_speed = max_speed
     data = encode_race_status(race=sys.race_state, cfg=sys.config, ts=timer)
@@ -77,30 +83,34 @@ def set_race_state(new_state: RaceState, sys: OxigenSystem, timer: RaceTimer) ->
     """
     Set the race state.
 
-            Parameters:
-                    new_state (RaceState): enum defining the desired state to be applied to the race
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param new_state: enum defining the desired state to be applied to the race
+    :type new_state: RaceState
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     sys.race_state.race_status =new_state
     data = encode_race_status(race=sys.race_state, cfg=sys.config, ts=timer)
     events.transmit_command_event.emit(data)
 
+
 def set_pit_stop_speed_limit(pit_speed: int, car_id: int, sys: OxigenSystem, timer: RaceTimer) -> None:
     """
-    Limit the maximum speed in pitlanes.
+    Limit the maximum speed in pit lanes.
 
-            Parameters:
-                    pit_speed (int): A decimal integer between 0 and 255
-                    car_id (int): Number of the car to which the limitation applies, if 0 applies to all cars
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param pit_speed: A decimal integer between 0 and 255
+    :type pit_speed: int
+    :param car_id: Number of the car to which the limitation applies, if 0 applies to all cars
+    :type car_id: int
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     cmd = O2Command(
         id=car_id,
@@ -115,14 +125,16 @@ def set_car_max_speed(max_speed: int, car_id: int, sys: OxigenSystem, timer: Rac
     """
     Limit the maximum speed of a car.
 
-            Parameters:
-                    max_speed (int): A decimal integer between 0 and 255
-                    car_id (int): Number of the car to which the limitation applies, if 0 applies to all cars
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param max_speed: A decimal integer between 0 and 255
+    :type max_speed: int
+    :param car_id: Number of the car to which the limitation applies, if 0 applies to all cars
+    :type car_id: int
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     cmd = O2Command(
         id=car_id,
@@ -133,18 +145,21 @@ def set_car_max_speed(max_speed: int, car_id: int, sys: OxigenSystem, timer: Rac
     data = encode_command(race=sys.race_state, cfg=sys.config, cmd=cmd, ts=timer)
     events.transmit_command_event.emit(data)
 
+
 def set_car_min_speed(min_speed: int, car_id: int, sys: OxigenSystem, timer: RaceTimer) -> None:
     """
     Limit the minimum speed of a car.
 
-            Parameters:
-                    min_speed (int): A decimal integer between 0 and 255
-                    car_id (int): Number of the car to which the limitation applies, if 0 applies to all cars
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param min_speed: A decimal integer between 0 and 255
+    :type min_speed: int
+    :param car_id: Number of the car to which the limitation applies, if 0 applies to all cars
+    :type car_id: int
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     cmd = O2Command(
         id=car_id,
@@ -159,14 +174,16 @@ def set_car_max_brake(max_brake: int, car_id: int, sys: OxigenSystem, timer: Rac
     """
     Limit the brake force of a car.
 
-            Parameters:
-                    max_brake (int): A decimal integer between 0 and 255
-                    car_id (int): Number of the car to which the limitation applies, if 0 applies to all cars
-                    sys (OxigenSystem): class describing the system configuration
-                    timer (RaceTimer): class providing timer functions
+    :param max_brake: A decimal integer between 0 and 255
+    :type max_brake: int
+    :param car_id: Number of the car to which the limitation applies, if 0 applies to all cars
+    :type car_id: int
+    :param sys: class describing the system configuration
+    :type sys: OxigenSystem
+    :param timer: class providing system timer
+    :type timer: RaceTimer
 
-            Returns:
-                    None
+    :return: None
     """
     cmd = O2Command(
         id=car_id,
