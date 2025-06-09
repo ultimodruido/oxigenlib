@@ -55,7 +55,7 @@ class Events:
     pit_lane_enter_event = Signal(int, int)
     pit_lane_leave_event = Signal(int, int)
     # global event
-    track_call_event = Signal(bool)
-    all_cars_on_track_event = Signal(bool)
+    track_call_event = Signal(bool, list)
+    all_cars_on_track_event = Signal(bool, list)
 
 oxigen_events = Events()
