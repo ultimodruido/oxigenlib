@@ -28,7 +28,8 @@ class Dongle:
             data = encode_firmware_version_request()
             self.send(data)
             # read reply
-            data = read_dongle_firmware(self._dongle.read(5))
+            #data = read_dongle_firmware(self._dongle.read(5))
+            _ = read_dongle_firmware(self._dongle.read(5))
             # TODO check that firmware is OK with this library
             # send free race so that the controller start notify themselves
             data = encode_free_race()
@@ -36,7 +37,7 @@ class Dongle:
             # inform that connection was successful
             events.dongle_connected_event.emit(True)
 
-        except serial.SerialException as e:
+        except serial.SerialException:
             print(f"Unable to open communication with the dongle on {port}. Try again")
             events.dongle_connected_event.emit(False)
 
