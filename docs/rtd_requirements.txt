@@ -1,2 +1,5 @@
 sphinx==8.2.3
 sphinx_rtd_theme==3.0.2
+pydantic==2.11.4
+psygnal==0.12
+pyserial==3.5
